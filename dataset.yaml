@@ -1,5 +1,6 @@
 names:
 - face
 nc: 1
+path: /home/yi-cheng/Desktop/server
 train: ../dataset/images/train/
 val: ../dataset/images/val/
