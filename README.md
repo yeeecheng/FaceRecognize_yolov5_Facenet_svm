@@ -1,6 +1,7 @@
 # Face Recognize
 
-## best-int8_edgetpu.tflite 為人臉偵測的權重 imgsz 160
+### best-int8_edgetpu.tflite 為人臉偵測的權重 imgsz 160
+### face_detect.py 要放進yolov5
 
 ## 註冊新的使用者
 
