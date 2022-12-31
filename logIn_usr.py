@@ -14,7 +14,9 @@ def log_in(opt):
     num = opt.num
     
     new_usr_dataset_path = os.path.join(root,"./dataset/new_usr_dataset")  
-   
+    if not os.path.isdir(new_usr_dataset_path):
+        os.mkdir(new_usr_dataset_path)
+        
     cap = cv2.VideoCapture(0)
     cnt = 0
     
@@ -24,6 +26,7 @@ def log_in(opt):
         
         ret ,frame =  cap.read()
         if not ret :
+            
             break 
         
         img_dir =os.path.join(new_usr_dataset_path,label)
@@ -39,9 +42,12 @@ def log_in(opt):
             break
         
     print("finish capture img")
+    print("")
 
 # 照片處理
 def alignment_img(root):
+    
+    print("start alignment img")
     
     new_usr_dataset_path = os.path.join(root,"./dataset/new_usr_dataset")  
     
@@ -64,12 +70,19 @@ def alignment_img(root):
             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
             cv2.imwrite(img_path,img)
 
+    print("end alignment img")
+    print("")
+    
 def main(opt):
     
-    #log_in(opt)
-    #alignment_img(opt.root)
-
+    # 拍使用者臉部照片
+    log_in(opt)
+    # 圖片臉部擷取
+    alignment_img(opt.root)
+    
+    # 分類訓練
     TC = train_classify(opt.root)
+    # 預處理訓練的圖片 , 轉成特徵向量
     TC.set_training_data()
     TC.train()
     

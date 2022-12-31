@@ -11,7 +11,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import Normalizer
 from sklearn.svm import SVC
 import pickle
-
+import shutil
 
 class train_classify:
     
@@ -25,6 +25,8 @@ class train_classify:
 
     def set_training_data(self):
         
+        print("start set training data")
+        
         # 讀取新的使用者資料
         new_img_train ,new_label_train = self.load_dataset(os.path.join(self.root ,"./dataset/new_usr_dataset"))
 
@@ -36,8 +38,7 @@ class train_classify:
         dataset = np.load(npz_save_path)
         # 取出 , 分別為臉部特徵和標籤
         emb_train,label_train = dataset["emb"] ,dataset["label"]
-
-
+        
         embs =list()
         labels=list()
         # 取得臉部特徵 ,並加入
@@ -65,11 +66,17 @@ class train_classify:
         self.emb_train =emb_train
         self.label_train = label_train
         
+
+        
         # 存成檔案,後續新增不需要全部使用者重用
+        print("save the face vector")        
         np.savez_compressed(npz_save_path,emb = emb_train,label= label_train)
-    
+        print("end set training data")
+        print("")
+        
     def train(self):
 
+        print("start train ")
         # normalize 
         nor =Normalizer()
         emd_norm_train = nor.transform(self.emb_train)
@@ -89,17 +96,29 @@ class train_classify:
         print('Accuracy: train=%.3f' % (score_train*100))
 
         # save model
+        print("save model")
         label_unique = np.unique(self.label_train)
         SVCmodel_save_path = os.path.join(self.root,"SVCmodel.pkl")
         with open(SVCmodel_save_path,"wb") as f:
             # 放model 和 class 種類
             pickle.dump((SVCmodel,label_unique),f)
-    
+
+        print("end train")
+        print("")
+        
+        dir_path = os.path.join(self.root,"./dataset/new_usr_dataset")
+        shutil.rmtree(dir_path)
+        
     # 讀取資料
     def load_dataset(self,dir_path):
         
         X,Y = list(),list()
-        
+
+        ## 如果沒有圖片
+        if len(os.listdir(dir_path)) <= 1:
+            print("There is not img")
+            exit(0)
+            
         for subdir in os.listdir(dir_path):
             
             path = os.path.join(dir_path,subdir)
@@ -108,13 +127,10 @@ class train_classify:
             faces = list()
             for img in os.listdir(path):
                 img_path = os.path.join(path,img)
-                
-                face = RetinaFace.extract_faces(img_path)
-                #face =cv2.imread(img_path)
-                if len(face) != 1:
-                    continue 
-                
-                faces.append(face[0])
+        
+                face =cv2.imread(img_path)
+                       
+                faces.append(face)
             
             labels = [subdir for i in range(len(faces))]
             
