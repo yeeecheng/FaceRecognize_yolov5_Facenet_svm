@@ -1,5 +1,7 @@
 # Face Recognize
 
+## best-int8_edgetpu.tflite 為人臉偵測的權重 imgsz 160
+
 ## 註冊新的使用者
 
 ```cmd
@@ -21,6 +23,4 @@ python3 face_alignment.py --root <根目錄> --train_dataset <欲訊練的資料
 
  ```cmd
  python3 face_detect.py --weight /home/yi-cheng/Desktop/face_recognize_yolov5/best-int8_edgetpu.tflite --data /home/yi-cheng/Desktop/face_recognize_yolov5/dataset.yaml --svc /home/yi-cheng/Desktop/face_recognize_yolov5/SVCmodel.pkl --imgsz 160
- 
-
  ```
