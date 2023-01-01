@@ -33,6 +33,7 @@ def run(
         source=0,  # file/dir/URL/glob/screen/0(webcam)
         data=ROOT / 'dataset.yaml',  # dataset.yaml path
         imgsz=(160, 160),  # inference size (height, width)
+        save= ROOT/"./face_detect_result.txt",
         conf_thres=0.3,  # confidence threshold
         iou_thres=0.6,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
@@ -156,16 +157,18 @@ def run(
                         best_class_probabilities = predictions[
                             np.arange(len(best_class_indices)), best_class_indices]
                         
+                        if type(tmp_label)!=str:
+                            tmp_label=tmp_label[0]
                         # print(best_class_probabilities)
                         print(class_name, predictions)
 
                         if best_class_probabilities < 0.95:
                             tmp_label = "others"
-
+                       
                         print(tmp_label)
                         # ***************************************************
                         
-                        with open("./face_detect_result.txt","w") as res:
+                        with open(save,"w") as res:
                             res.write(tmp_label)
       
 
@@ -183,6 +186,7 @@ def parse_opt():
     parser.add_argument('--source', type=str, default="0", help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--data', type=str, default=ROOT / 'dataset.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[160], help='inference size h,w')
+    parser.add_argument('--save', type=str ,default=ROOT/"./face_detect_result.txt")
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
