@@ -33,11 +33,11 @@ def log_in(opt):
         if not os.path.isdir(img_dir):
             os.mkdir(img_dir)
         img_path = os.path.join(img_dir,str(cnt)+".png")
-        
+        frame = cv2.resize(frame,(160,160))
         cv2.imwrite(img_path , frame)
         
         cnt+=1        
-        time.sleep(0.5)
+        #time.sleep(0.5)
         if cnt >= num :
             break
         
@@ -45,30 +45,29 @@ def log_in(opt):
     print("")
 
 # 照片處理
-def alignment_img(root):
+def alignment_img(opt):
     
+    root = opt.root
+    label = opt.label
     print("start alignment img")
     
-    new_usr_dataset_path = os.path.join(root,"./dataset/new_usr_dataset")  
+    new_usr_dataset_path = os.path.join(root,"./dataset/new_usr_dataset/",label)  
     
     model = RetinaFace
     
-    for subdir in os.listdir(new_usr_dataset_path):
+    for img in os.listdir(new_usr_dataset_path):
         
-        subdir_path = os.path.join(new_usr_dataset_path,subdir)
+        img_path = os.path.join(new_usr_dataset_path,img)
+        print(f"read {img_path}")
+      
+        faces = model.extract_faces(img_path)
+        if len(faces) != 1:
+            os.remove(img_path)
+            continue
         
-        for img in os.listdir(subdir_path):
-            
-            img_path = os.path.join(subdir_path,img)
-          
-            faces = model.extract_faces(img_path)
-            if len(faces) != 1:
-                os.remove(img_path)
-                continue
-            
-            img = cv2.resize(faces[0],(160,160))
-            img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-            cv2.imwrite(img_path,img)
+        #img = cv2.resize(faces[0],(160,160))
+        img = cv2.cvtColor(faces[0],cv2.COLOR_BGR2RGB)
+        cv2.imwrite(img_path,img)
 
     print("end alignment img")
     print("")
@@ -78,10 +77,10 @@ def main(opt):
     # 拍使用者臉部照片
     log_in(opt)
     # 圖片臉部擷取
-    alignment_img(opt.root)
+    alignment_img(opt)
     
     # 分類訓練
-    TC = train_classify(opt.root)
+    TC = train_classify(opt)
     # 預處理訓練的圖片 , 轉成特徵向量
     TC.set_training_data()
     TC.train()

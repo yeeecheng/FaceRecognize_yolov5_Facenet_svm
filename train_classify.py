@@ -15,26 +15,29 @@ import shutil
 
 class train_classify:
     
-    def __init__(self,root):
+    def __init__(self,opt):
         
         # 載入model
         self.embedding_model = DeepFace.build_model("Facenet")
         
         # the path where weight save 
-        self.root = root
+        self.root = opt.root
+        self.label = opt.label
+        self.first = False
 
     def set_training_data(self):
         
         print("start set training data")
         
         # 讀取新的使用者資料
-        new_img_train ,new_label_train = self.load_dataset(os.path.join(self.root ,"./dataset/new_usr_dataset"))
-
-        # 讀取目前的dataset
         npz_save_path =os.path.join(self.root ,"./faces-dataset.npz")
+        # 讀取目前的dataset
         if not os.path.isfile(npz_save_path):
             np.savez(npz_save_path,emb =list(),label=list())
+            self.first =True
             
+        new_img_train ,new_label_train = self.load_dataset(os.path.join(self.root ,"./dataset/new_usr_dataset"),self.first)
+     
         dataset = np.load(npz_save_path)
         # 取出 , 分別為臉部特徵和標籤
         emb_train,label_train = dataset["emb"] ,dataset["label"]
@@ -106,23 +109,35 @@ class train_classify:
         print("end train")
         print("")
         
-        dir_path = os.path.join(self.root,"./dataset/new_usr_dataset")
+        dir_path = os.path.join(self.root,"./dataset/new_usr_dataset/",self.label)
+        print(dir_path)
         shutil.rmtree(dir_path)
         
     # 讀取資料
-    def load_dataset(self,dir_path):
+    def load_dataset(self,dir_path,first):
         
         X,Y = list(),list()
 
-        ## 如果沒有圖片
-        if len(os.listdir(dir_path)) <= 1:
-            print("There is not img")
+        
+        ## 如果沒有用戶資料夾
+        if len(os.listdir(dir_path)) == 1 and not first :
+            print("There is no User's img")
             exit(0)
-            
+
         for subdir in os.listdir(dir_path):
             
+            # 不是第一次執行,就只轉換label
+            if not first:
+                if subdir != self.label:
+                    continue
+                
             path = os.path.join(dir_path,subdir)
             print(f"load {path}")
+            
+            # 如果資料夾裡面沒有照片
+            if len(os.listdir(path)) == 0:
+                print("There is no img")
+                exit(0)
             
             faces = list()
             for img in os.listdir(path):
