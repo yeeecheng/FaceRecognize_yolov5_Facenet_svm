@@ -17,7 +17,9 @@ python3 logIn_usr.py --root <根目錄> --label <label_name> --num <想要拍攝
  ```cmd
  python3 face_detect.py --weight <tfllie位置> --data <dataset.yaml位置> --svc <svc權重檔位置> --imgsz 160 --save <輸出結果位置>
  ```
-## 以下為用yolov5 train 
+## 以下為用yolov5 train
+
+> 你會用到training_face_detect_yolov5
 ### 開啟client
 
 ```cmd
